@@ -1,13 +1,34 @@
-import React,{useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import React,{useEffect, useReducer} from 'react';
+import {Switch, useParams} from 'react-router-dom';
 import { apiGet } from '../misc/config';
+
+const reducer = (prevState, action)=> {
+    Switch(action.type) {
+
+        case 'FETCH_SUCCESS' : {
+            return {isLoading: false, error: null , show: action.show};
+        }
+
+        case 'FETCH_FAILED': {
+            return {...prevState, isLoading: false, error: action.error};
+        }
+
+        default:return prevState
+
+    }
+}
+
+const initialState= {
+    show: null,
+    isLoading: true,
+    error: null
+}
 
 function Show() {
 
     const {id} = useParams();
-    const [show, setShow] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+
+    const [{show, isLoading, error}, dispatch] = useReducer(reducer, initialState)
 
     useEffect(()=>{
 
@@ -18,16 +39,18 @@ function Show() {
 
            
                 if(isMounted){
-                    setShow(results);
-                    setIsLoading(false);
+
+                    dispatch({type: 'FETCH_SUCCESS', show: results})
+
+                   
 
                 }
 
         })
         .catch(err => {
             if(isMounted){
-                setError(err.message);
-                setIsLoading(false);
+                dispatch({type: 'FETCH_FAILED', error: err.message })
+
 
             }
         });
