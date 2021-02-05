@@ -1,5 +1,4 @@
 import {useEffect, useReducer} from 'react';
-import { ThemeProvider } from 'styled-components';
 
 function showReducer(prevState, action){
     switch(action.type) {
