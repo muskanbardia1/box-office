@@ -1,9 +1,14 @@
+/* eslint-disable no-underscore-dangle */
 import React,{useEffect, useReducer} from 'react';
-import {Switch, useParams} from 'react-router-dom';
+import { useParams} from 'react-router-dom';
+import Cast from '../components/show/Cast';
+import Details from '../components/show/Details';
+import Seasons from '../components/show/Seasons';
+import ShowMainData from '../components/show/ShowMainData';
 import { apiGet } from '../misc/config';
 
 const reducer = (prevState, action)=> {
-    Switch(action.type) {
+    switch(action.type) {
 
         case 'FETCH_SUCCESS' : {
             return {isLoading: false, error: null , show: action.show};
@@ -13,10 +18,11 @@ const reducer = (prevState, action)=> {
             return {...prevState, isLoading: false, error: action.error};
         }
 
-        default:return prevState
+        default:
+            return prevState;
 
     }
-}
+};
 
 const initialState= {
     show: null,
@@ -29,7 +35,7 @@ function Show() {
     const {id} = useParams();
 
     const [{show, isLoading, error}, dispatch] = useReducer(reducer, initialState)
-
+ 
     useEffect(()=>{
 
         let isMounted = true;
@@ -40,7 +46,7 @@ function Show() {
            
                 if(isMounted){
 
-                    dispatch({type: 'FETCH_SUCCESS', show: results})
+                    dispatch({type: 'FETCH_SUCCESS', show: results});
 
                    
 
@@ -49,7 +55,7 @@ function Show() {
         })
         .catch(err => {
             if(isMounted){
-                dispatch({type: 'FETCH_FAILED', error: err.message })
+                dispatch({type: 'FETCH_FAILED', error: err.message });
 
 
             }
@@ -72,8 +78,34 @@ function Show() {
 
     return (
         <div>
-            This id Show Page!
+            <ShowMainData 
+            image={show.image} 
+            name={show.name} 
+            rating={show.rating}
+            summary={show.summary}
+            tags={show.genres}
+            />
+
+            <div>
+            <h2>Details</h2>
+            <Details 
+            status={show.status}
+            network={show.network}
+            premiered={show.premiered}
+            />
+            </div>
+
+            <div>
+            <h2>Seasons</h2>
+            <Seasons seasons={show._embedded.seasons}/>
+            </div>
+
+            <div>
+            <h2>Cast</h2>
+            <Cast cast={show._embedded.cast}/>
+            </div>
         </div>
+
     );
 }
 
